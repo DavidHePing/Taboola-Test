@@ -1,7 +1,11 @@
 package com.taboola.spark;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.spark.api.java.function.ForeachPartitionFunction;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -31,10 +35,22 @@ public class SparkApp {
         //
         // The spark stream should collect, in the database, for each time bucket and event id, a counter of all the messages received.
         // The time bucket has a granularity of 1 minute.
-        events
-                .writeStream()
+        Dataset<Row> aggregatedEvents = events
+                .withWatermark("timestamp", "5 minutes") // Allow up to 5 minutes of late data
+                .groupBy(
+                        functions.window(functions.col("timestamp"), "1 minute"),
+                        functions.col("eventId")
+                )
+                .count()
+                .withColumn("time_bucket", functions.col("window.start"))
+                .select("time_bucket", "eventId", "count");
+
+        aggregatedEvents.printSchema();
+        aggregatedEvents.writeStream()
+                .outputMode("complete")
                 .format("console")
-                .trigger(Trigger.ProcessingTime(10, TimeUnit.SECONDS))
+                .option("truncate", false)
+                .trigger(Trigger.ProcessingTime("10 seconds"))
                 .start();
 
         // the stream will run forever
