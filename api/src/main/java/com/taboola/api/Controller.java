@@ -22,9 +22,9 @@ public class Controller {
         return Instant.now().toEpochMilli();
     }
 
-    @GetMapping("/test")
+    @GetMapping("/health")
     public String test() {
-        return testService.Test();
+        return "healthy";
     }
 
 
