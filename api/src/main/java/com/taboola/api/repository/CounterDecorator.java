@@ -16,7 +16,7 @@ public class CounterDecorator implements ICounterRepository {
     private final ICounterRepository repository;
     private final JedisPool jedisPool;
     private final IJsonUtil jsonUtil;
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddhhmm");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 
     public CounterDecorator(@Qualifier("counterRepository") ICounterRepository repository, JedisPool jedisPool, IJsonUtil jsonUtil) {
         this.repository = repository;
