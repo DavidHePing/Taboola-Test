@@ -116,7 +116,7 @@ Database:
 
 Endpoint output:
 
-/api/counters/time/201903041000:
+/api/counters/time/202411241222:
 {
     "1": 2,
     "2": 1
