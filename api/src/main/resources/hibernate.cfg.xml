@@ -5,7 +5,7 @@
     <session-factory>
         <!-- Database connection settings -->
         <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
-        <property name="hibernate.connection.url">jdbc:hsqldb:hsql://localhost/xdb</property>
+        <property name="hibernate.connection.url">jdbc:hsqldb:hsql://host.docker.internal/xdb</property>
         <property name="hibernate.connection.username">sa</property>
         <property name="hibernate.connection.password"></property>
         <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>

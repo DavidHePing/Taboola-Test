@@ -1,0 +1,17 @@
+DockerHubUrl="localhost:5000"
+Tag=$1
+
+
+ImageName="$DockerHubUrl/springboot-test1:${Tag}"
+
+(
+    docker pull $ImageName
+
+    helm upgrade --install springboot-test1 helm-chart/ \
+    --set service.nodePort=8080 \
+    --set image.repository=$ImageName \
+    --set fullnameOverride=springboot-test1
+
+    # docker-compose pull
+    # docker-compose up -d
+)

@@ -5,28 +5,20 @@ on:
     branches:
       - 'master'
 jobs:
-  test:
+  build-api:
+    name: Build image and push
     runs-on: wsl-ubuntu
-
     steps:
-      # Step 1: Print a message
-      - name: Print Hello World
-        run: echo "Hello, World! This is a GitHub Action workflow."
-
-#  build:
-#    name: Build image and push
-#    runs-on: wsl-ubuntu
-#    steps:
-#      - name: Checkout Code
-#        uses: actions/checkout@v3
-#      - run: chmod +x build.sh
-#      - run: ./build.sh ${{ github.run_id }}
-#  deploy:
-#    name: Pull image and deploy
-#    runs-on: wsl-ubuntu
-#    needs: build
-#    steps:
-#      - name: Checkout Code
-#        uses: actions/checkout@v3
-#      - run: chmod +x run.sh
-#      - run: ./run.sh ${{ github.run_id }}
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - run: chmod +x ./api/build.sh
+      - run: ./api/build.sh ${{ github.run_id }}
+  deploy-api:
+    name: Pull image and deploy
+    runs-on: wsl-ubuntu
+    needs: build-api
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - run: chmod +x ./api/run.sh
+      - run: ./api/run.sh ${{ github.run_id }}
