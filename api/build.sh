@@ -1,4 +1,4 @@
-DockerHubUrl="host.docker.internal:5000"
+DockerHubUrl="localhost:5000"
 Tag=$1
 
 ImageName="$DockerHubUrl/springboot-test1:${Tag}"
