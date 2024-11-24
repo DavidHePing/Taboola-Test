@@ -1,0 +1,16 @@
+architecture: replication
+cluster:
+  enabled: true
+  slaveCount: 2
+master:
+  service:
+    type: NodePort
+    nodePorts:
+      redis: "32101"
+replica:
+  service:
+    type: NodePort
+    nodePorts:
+      redis: "32102"
+auth:
+  enabled: false

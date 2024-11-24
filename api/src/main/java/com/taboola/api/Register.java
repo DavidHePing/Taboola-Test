@@ -19,6 +19,6 @@ public class Register {
 
     @Bean
     public JedisPool jedisPool() {
-        return new JedisPool("host.docker.internal", 6379);
+        return new JedisPool("host.docker.internal", 32101);
     }
 }
