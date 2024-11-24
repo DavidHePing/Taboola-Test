@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Repository
+@Repository("counterRepository")
 public class CounterRepository implements ICounterRepository {
 
     private final SessionFactory sessionFactory;

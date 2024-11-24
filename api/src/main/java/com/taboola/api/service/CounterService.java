@@ -3,6 +3,7 @@ package com.taboola.api.service;
 import com.taboola.api.model.EventCounter;
 
 import com.taboola.api.repository.ICounterRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class CounterService implements ICounterService {
     private final ICounterRepository counterRepository;
 
-    public CounterService(ICounterRepository counterRepository) {
+    public CounterService(@Qualifier("counterDecorator") ICounterRepository counterRepository) {
         this.counterRepository = counterRepository;
     }
 

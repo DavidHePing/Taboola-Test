@@ -1,13 +1,11 @@
 package com.taboola.api;
 
 import com.taboola.api.model.EventCounter;
-import com.taboola.api.repository.CounterRepository;
-import com.taboola.api.repository.ICounterRepository;
-import com.taboola.api.service.CounterService;
-import com.taboola.api.service.ICounterService;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 public class Register {
@@ -17,5 +15,10 @@ public class Register {
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(EventCounter.class)
                 .buildSessionFactory();
+    }
+
+    @Bean
+    public JedisPool jedisPool() {
+        return new JedisPool("host.docker.internal", 6379);
     }
 }
