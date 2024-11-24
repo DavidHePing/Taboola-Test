@@ -7,5 +7,5 @@ ImageName="$DockerHubUrl/springboot-test1:${Tag}"
 docker builder prune -f
 docker image prune -f
 
-docker build -t "$ImageName" . &&
+docker build -t "$ImageName" ./api &&
 docker image push "$ImageName"
