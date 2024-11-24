@@ -1,9 +1,9 @@
 ![img.png](img.png)
 
 ### CDN
-#### cache http code 200
-#### do load balance to k8s nodes
+#### 1. cache http code 200
+#### 2. do load balance to k8s nodes
 
 ### Redis Cluster
-#### avoid hot spot
-#### HA
+#### 1. avoid hot spot
+#### 2. HA
