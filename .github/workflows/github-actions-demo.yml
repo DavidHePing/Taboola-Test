@@ -1,0 +1,32 @@
+name: GitHub Actions CD
+run-name: CD Flow 🚀
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Print a message
+      - name: Print Hello World
+        run: echo "Hello, World! This is a GitHub Action workflow."
+
+#  build:
+#    name: Build image and push
+#    runs-on: wsl-ubuntu
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#      - run: chmod +x build.sh
+#      - run: ./build.sh ${{ github.run_id }}
+#  deploy:
+#    name: Pull image and deploy
+#    runs-on: wsl-ubuntu
+#    needs: build
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#      - run: chmod +x run.sh
+#      - run: ./run.sh ${{ github.run_id }}
