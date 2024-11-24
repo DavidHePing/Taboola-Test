@@ -1,14 +1,12 @@
 package com.taboola.spark;
 
-import java.io.FileInputStream;
 import java.sql.Timestamp;
-import java.util.Properties;
 
 import com.taboola.spark.model.EventCounter;
 
-import org.apache.spark.sql.streaming.Trigger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.apache.spark.api.java.function.ForeachPartitionFunction;
 import org.apache.spark.sql.functions;
@@ -57,6 +55,7 @@ public class SparkApp {
             .foreachBatch((dataset, batchId) -> {
                 dataset.foreachPartition((ForeachPartitionFunction<Row>) partition -> {
                     try (Session session = sessionFactory.openSession()) {
+                        Transaction transaction = session.beginTransaction();
 
                         // Iterate through the partition and insert/update each row
                         while (partition.hasNext()) {
@@ -67,10 +66,11 @@ public class SparkApp {
                             eventCounter.setEventId(row.getAs("eventId"));
                             eventCounter.setCount(row.getAs("count"));
 
-                            // Use merge to insert or update
-                            session.merge(eventCounter);
-                            session.getTransaction().commit();
+                            // Use saveOrUpdate to insert or update
+                            session.saveOrUpdate(eventCounter);
                         }
+
+                        transaction.commit();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
