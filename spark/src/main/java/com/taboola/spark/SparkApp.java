@@ -1,18 +1,23 @@
 package com.taboola.spark;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.util.concurrent.TimeUnit;
+import java.io.FileInputStream;
+import java.sql.Timestamp;
+import java.util.Properties;
 
+import com.taboola.spark.model.EventCounter;
+
+import org.apache.spark.sql.streaming.Trigger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.apache.spark.api.java.function.ForeachPartitionFunction;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.streaming.StreamingQueryException;
-import org.apache.spark.sql.streaming.Trigger;
 import org.apache.spark.sql.types.DataTypes;
+
 
 public class SparkApp {
 
@@ -26,7 +31,6 @@ public class SparkApp {
         // each event has an id (eventId) and a timestamp
         // an eventId is a number between 0 an 99
         Dataset<Row> events = getEvents(spark);
-        events.printSchema();
 
         // REPLACE THIS CODE
         // The spark stream continuously receives messages. Each message has 2 fields:
@@ -45,13 +49,36 @@ public class SparkApp {
                 .withColumn("time_bucket", functions.col("window.start"))
                 .select("time_bucket", "eventId", "count");
 
-        aggregatedEvents.printSchema();
+        Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+        configuration.addAnnotatedClass(EventCounter.class);
+        SessionFactory sessionFactory = configuration.buildSessionFactory();
+
         aggregatedEvents.writeStream()
-                .outputMode("complete")
-                .format("console")
-                .option("truncate", false)
-                .trigger(Trigger.ProcessingTime("10 seconds"))
-                .start();
+            .foreachBatch((dataset, batchId) -> {
+                dataset.foreachPartition((ForeachPartitionFunction<Row>) partition -> {
+                    try (Session session = sessionFactory.openSession()) {
+
+                        // Iterate through the partition and insert/update each row
+                        while (partition.hasNext()) {
+                            Row row = partition.next();
+
+                            EventCounter eventCounter = new EventCounter();
+                            eventCounter.setTimeBucket(Timestamp.valueOf(row.getAs("time_bucket").toString()));
+                            eventCounter.setEventId(row.getAs("eventId"));
+                            eventCounter.setCount(row.getAs("count"));
+
+                            // Use merge to insert or update
+                            session.merge(eventCounter);
+                            session.getTransaction().commit();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            })
+            .outputMode("update") // Use append or update mode as needed
+            .start();
+
 
         // the stream will run forever
         spark.streams().awaitAnyTermination();
